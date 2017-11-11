@@ -17,7 +17,7 @@ anywhere without needing to require anything.
 
 ### Raw
 
-```
+``` clojure
 (require '[com.gfredericks.dot-slash-2 :as dot-slash-2])
 
 ;; Defines a namespace called . and adds ./doc, ./source,
@@ -33,7 +33,7 @@ anywhere without needing to require anything.
 
 In your `project.clj` or `:user` profile or whatever:
 
-```
+``` clojure
 :injections [(do
                (require 'com.gfredericks.dot-slash-2)
                ((resolve 'com.gfredericks.dot-slash-2/!)
