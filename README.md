@@ -43,6 +43,12 @@ In your `project.clj` or `:user` profile or whatever:
                      clojure.tools.namespace.repl/refresh]}))]
 ```
 
+## Potential Future Features
+
+- Renaming
+- Lazy loading
+- Dynamic resolution, for proxying to code that can be reloaded
+
 ## License
 
 Copyright © 2017 Gary Fredericks
