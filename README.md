@@ -15,7 +15,33 @@ anywhere without needing to require anything.
 
 ## Usage
 
-TODO.
+### Raw
+
+```
+(require '[com.gfredericks.dot-slash-2 :as dot-slash-2])
+
+;; Defines a namespace called . and adds ./doc, ./source,
+;; ./run-tests, and ./refresh
+(dot-slash-2/!
+ '{. [clojure.repl/doc
+      clojure.repl/source
+      clojure.test/run-tests
+      clojure.tools.namespace.repl/refresh]})
+```
+
+### Leiningen
+
+In your `project.clj` or `:user` profile or whatever:
+
+```
+:injections [(do
+               (require 'com.gfredericks.dot-slash-2)
+               ((resolve 'com.gfredericks.dot-slash-2/!)
+                '{. [clojure.repl/doc
+                     clojure.repl/source
+                     clojure.test/run-tests
+                     clojure.tools.namespace.repl/refresh]}))]
+```
 
 ## License
 
