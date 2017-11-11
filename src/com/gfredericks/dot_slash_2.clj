@@ -19,9 +19,20 @@
     (create-ns ns-name)
     (doseq [sym vars-and-things
             :let [its-ns (symbol (namespace sym))]]
-      (require its-ns)
-      (let [the-var (resolve sym)]
-        (doto
-            (intern ns-name (symbol (name sym))
-                    @the-var)
-          (cond-> (.isMacro the-var) (.setMacro)))))))
+      (and
+       (try
+         (require its-ns)
+         true
+         (catch Exception e
+           (binding [*out* *err*]
+             (printf "dot-slash-2 failed to require '%s to proxy '%s\n  (%s)\n"
+                     its-ns (name sym) (.getMessage e)))
+           ;; short-circuits the `and` so the rest of the
+           ;; code doesn't execute
+           false))
+       (let [the-var (resolve sym)]
+         (doto
+             (intern ns-name (symbol (name sym))
+                     @the-var)
+           (cond-> (.isMacro the-var) (.setMacro))
+           (alter-meta! merge (meta the-var))))))))

@@ -16,4 +16,19 @@
   (is (= 19 ((resolve '&&/+)
              @(resolve '$$/fifteen)
              5)))
-  (is (thrown? Exception (eval '&&/doc))))
+  (is (thrown? Exception (eval '&&/doc)))
+
+  (is (re-find #"Returns the sum of nums"
+               (eval
+                '(:doc (meta #'&&/+))))))
+
+(deftest require-failure-test
+  (let [stderr
+        (with-out-str
+          (binding [*err* *out*]
+            (sut/! '{&$%&! [doesn't-exist/at-all
+                            com.gfredericks.dot-slash-2-test/fifteen]})))]
+    (is (not (resolve '&$%&!/at-all))
+        "The proxy var didn't get created")
+    (is (re-find #"dot-slash-2 failed to require 'doesn't-exist to proxy 'at-all" stderr))
+    (is (= 14 (eval '&$%&!/fifteen)))))
