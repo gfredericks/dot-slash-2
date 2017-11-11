@@ -1,4 +1,4 @@
-(defproject com.gfredericks/dot-slash-2 "0.1.1-SNAPSHOT"
+(defproject com.gfredericks/dot-slash-2 "0.1.1"
   :description "Clojure library for easily creating proxy namespaces"
   :url "https://github.com/gfredericks/dot-slash-2"
   :license {:name "Eclipse Public License"
