@@ -30,8 +30,9 @@
            ;; short-circuits the `and` so the rest of the
            ;; code doesn't execute
            false))
-       (let [the-var (resolve sym)]
+       (let [^clojure.lang.Var the-var (resolve sym)]
          (doto
+             ^clojure.lang.Var
              (intern ns-name (symbol (name sym))
                      @the-var)
            (cond-> (.isMacro the-var) (.setMacro))
