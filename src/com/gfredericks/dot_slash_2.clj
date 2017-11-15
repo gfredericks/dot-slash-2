@@ -30,10 +30,15 @@
            ;; short-circuits the `and` so the rest of the
            ;; code doesn't execute
            false))
-       (let [^clojure.lang.Var the-var (resolve sym)]
+       (let [^clojure.lang.Var orig-var (resolve sym)
+             ^clojure.lang.Var new-var (intern ns-name
+                                               (symbol (name sym))
+                                               @orig-var)]
          (doto
-             ^clojure.lang.Var
-             (intern ns-name (symbol (name sym))
-                     @the-var)
-           (cond-> (.isMacro the-var) (.setMacro))
-           (alter-meta! merge (meta the-var))))))))
+             new-var
+           (cond-> (.isMacro orig-var) (.setMacro))
+           (alter-meta! merge (meta orig-var)))
+         (add-watch orig-var (gensym "dot-slash-2")
+                    (fn [_ _ _ new]
+                      (alter-var-root new-var (constantly new))
+                      (alter-meta! new-var merge (meta orig-var)))))))))

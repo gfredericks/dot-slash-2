@@ -32,3 +32,11 @@
         "The proxy var didn't get created")
     (is (re-find #"dot-slash-2 failed to require 'doesn't-exist to proxy 'at-all" stderr))
     (is (= 14 (eval '&$%&!/fifteen)))))
+
+(def mutate-me 49)
+
+(deftest update-test
+  (sut/! '{!!! [com.gfredericks.dot-slash-2-test/mutate-me]})
+  (is (= 49 (eval '!!!/mutate-me)))
+  (alter-var-root #'mutate-me inc)
+  (is (= 50 (eval '!!!/mutate-me))))
