@@ -17,6 +17,8 @@ anywhere without needing to require anything.
 
 ### Raw
 
+#### Basic
+
 ``` clojure
 (require '[com.gfredericks.dot-slash-2 :as dot-slash-2])
 
@@ -27,6 +29,22 @@ anywhere without needing to require anything.
       clojure.repl/source
       clojure.test/run-tests
       clojure.tools.namespace.repl/refresh]})
+```
+
+#### Advanced
+
+``` clojure
+(require '[com.gfredericks.dot-slash-2 :as dot-slash-2])
+
+;; Defines a namespace called & and adds ./d which proxies
+;; to clojure.repl/doc, and ./cool-util that dynamically
+;; proxies to user/cool-util (allowing the user namespace
+;; to be completely reloaded)
+(dot-slash-2/!
+ '{& [{:var clojure.repl/doc
+       :name d}
+      {:var user/cool-util
+       :dynamic? true}]})
 ```
 
 ### Leiningen
@@ -45,9 +63,7 @@ In your `project.clj` or `:user` profile or whatever:
 
 ## Potential Future Features
 
-- Renaming
 - Lazy loading
-- Dynamic resolution, for proxying to code that can be reloaded
 
 ## License
 

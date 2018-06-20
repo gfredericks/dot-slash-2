@@ -8,11 +8,18 @@
   (sut/! '{$$ [clojure.test/run-tests
                com.gfredericks.dot-slash-2-test/fifteen]
            && [clojure.core/+
-               clojure.repl/doc]})
+               clojure.repl/doc
+               {:var clojure.repl/apropos
+                :name tompkins}
+               {:var com.gfredericks.dot-slash-2-test/fifteen
+                :name thirteen}]})
   (is (resolve '$$/run-tests))
   (is (resolve '$$/fifteen))
   (is (= 14 @(resolve '$$/fifteen)))
   (is (resolve '&&/+))
+  (is (resolve '&&/tompkins))
+  (is (= 14 @(resolve '&&/thirteen)))
+  (is (not (resolve '&&/apropos)))
   (is (= 19 ((resolve '&&/+)
              @(resolve '$$/fifteen)
              5)))
@@ -40,3 +47,33 @@
   (is (= 49 (eval '!!!/mutate-me)))
   (alter-var-root #'mutate-me inc)
   (is (= 50 (eval '!!!/mutate-me))))
+
+(defn fake-require-new-ns
+  [sym]
+  (create-ns sym)
+  (dosync (alter @#'clojure.core/*loaded-libs* conj sym)))
+
+(deftest dynamism-test
+  (fake-require-new-ns 'ns-145)
+  (intern 'ns-145 'foo-static  (fn [] :old-value))
+  (intern 'ns-145 'foo-dynamic (fn [] :old-value))
+  (sut/! '{yopep [ns-145/foo-static
+                  {:var ns-145/foo-dynamic
+                   :dynamic? true}]})
+  (is (= :old-value (eval '(yopep/foo-static))))
+  (is (= :old-value (eval '(yopep/foo-dynamic))))
+  ;; Simulating what happens with, e.g.,
+  ;; clojure.tools.namespace.repl/refresh
+  (remove-ns 'ns-145)
+  (fake-require-new-ns 'ns-145)
+  (intern 'ns-145 'foo-static  (fn [] :new-value))
+  (intern 'ns-145 'foo-dynamic (fn [] :new-value))
+  (is (= :old-value (eval '(yopep/foo-static))))
+  (is (= :new-value (eval '(yopep/foo-dynamic)))))
+
+(deftest bad-name-test
+  (let [stderr
+        (with-out-str
+          (binding [*err* *out*]
+            (sut/! '{x2378 [clojure.test/ns-exists-but-var-doesn't]})))]
+    (is (re-find #"dot-slash-2 .*clojure.test/ns-exists-but-var-doesn't" stderr))))
