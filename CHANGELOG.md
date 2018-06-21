@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.1.3 - 2018-06-20
+
+- Added renaming
+- Added dynamic proxying
+- Better error messages
+
 ## 0.1.2 - 2017-11-14
 
 - Eliminated reflection
