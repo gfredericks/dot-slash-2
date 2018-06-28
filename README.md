@@ -36,8 +36,8 @@ anywhere without needing to require anything.
 ``` clojure
 (require '[com.gfredericks.dot-slash-2 :as dot-slash-2])
 
-;; Defines a namespace called & and adds ./d which proxies
-;; to clojure.repl/doc, and ./cool-util that dynamically
+;; Defines a namespace called & and adds &/d which proxies
+;; to clojure.repl/doc, and &/cool-util that dynamically
 ;; proxies to user/cool-util (allowing the user namespace
 ;; to be completely reloaded)
 (dot-slash-2/!
