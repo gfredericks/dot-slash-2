@@ -101,6 +101,9 @@
     (sut/! {'ns82 [{:var      fn-sym
                     :dynamic? true
                     :lazy?    true
+                    :macro?   false}
+                   {:var      'clojure.data/diff
+                    :lazy?    true
                     :macro?   false}]})
     (is (thrown? Exception
                  (eval (list fn-sym :foo)))
@@ -108,7 +111,11 @@
     (is (= :foo (eval '(ns82/jamboreen :foo)))
         "works through the proxy, which requires it")
     (is (= :foo (eval (list fn-sym :foo)))
-        "direct call works this time, proving it's been required")))
+        "direct call works this time, proving it's been required")
+    (eval '(ns82/diff {} {}))
+    (is (re-find #"Recursively compares a and b"
+                 (-> 'ns82/diff resolve meta :doc))
+        "adds the docstring once it's been called")))
 
 (deftest lazy-dynamic-test
   (sut/! {'ns4781 [{:var      'clojure.data/diff
@@ -120,4 +127,7 @@
                     :lazy?    true
                     :macro?   true}]})
   (is (= [nil nil {}] (eval '(ns4781/diff {} {}))))
-  (is (= 42 (eval '(ns4781/or nil false false 42 (throw (Exception. "unreachable")))))))
+  (is (= 42 (eval '(ns4781/or nil false false 42 (throw (Exception. "unreachable"))))))
+  (is (re-find #"Recursively compares a and b"
+               (-> 'ns4781/diff resolve meta :doc))
+      "adds the docstring once it's been called"))

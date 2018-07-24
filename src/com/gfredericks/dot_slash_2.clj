@@ -61,8 +61,10 @@
                 (apply (require-and-resolve underlying-symbol) args)))
             (fn one-time-lazy-stub [& args]
               (let [underlying-var (require-and-resolve underlying-symbol)]
-                (alter-var-root new-var (constantly @underlying-var))
-                (sync-changes new-var underlying-var)
+                (doto new-var
+                  (alter-var-root (constantly @underlying-var))
+                  (alter-meta! merge (meta underlying-var))
+                  (sync-changes underlying-var))
                 (apply @new-var args))))]
       (doto new-var
         (alter-var-root (constantly root-value))
