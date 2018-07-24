@@ -11,7 +11,7 @@ anywhere without needing to require anything.
 
 ## Obtention
 
-`[com.gfredericks/dot-slash-2 "0.1.4"]`
+`[com.gfredericks/dot-slash-2 "0.1.5"]`
 
 ## Usage
 
