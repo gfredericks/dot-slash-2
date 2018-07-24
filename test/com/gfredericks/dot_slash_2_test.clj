@@ -100,7 +100,8 @@
                   ns-name))
     (sut/! {'ns82 [{:var      fn-sym
                     :dynamic? true
-                    :lazy?    true}]})
+                    :lazy?    true
+                    :macro?   false}]})
     (is (thrown? Exception
                  (eval (list fn-sym :foo)))
         "hasn't been required yet")

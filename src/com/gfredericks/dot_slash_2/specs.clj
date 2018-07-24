@@ -8,8 +8,8 @@
 
 (defn lazy-specifies-macro?
   [m]
-  (if (:com.gfredericks.dot-slash-2/lazy? m)
-    (contains? m :com.gfredericks.dot-slash-2/macro?)
+  (if (:lazy? m)
+    (contains? m :macro?)
     true))
 
 (s/def :com.gfredericks.dot-slash-2/var-cfg
