@@ -72,7 +72,8 @@
                             :doc (format "Proxy to %s\n\nOriginal docs:\n\n%s\n%s"
                                          sym
                                          (pr-str (:arglists (meta orig-var)))
-                                         (:doc (meta orig-var)))))
+                                         (:doc (meta orig-var))))
+               (cond-> (.isMacro orig-var) (.setMacro)))
              (let [^clojure.lang.Var new-var (intern ns-name
                                                      proxy-name
                                                      @orig-var)]

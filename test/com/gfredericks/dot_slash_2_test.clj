@@ -77,3 +77,12 @@
           (binding [*err* *out*]
             (sut/! '{x2378 [clojure.test/ns-exists-but-var-doesn't]})))]
     (is (re-find #"dot-slash-2 .*clojure.test/ns-exists-but-var-doesn't" stderr))))
+
+(defmacro unnecessary-adding-macro
+  [a b]
+    `(+ ~a ~b))
+
+(deftest dynamic-macros-test
+  (sut/! {'ns1894 [{:var      `unnecessary-adding-macro
+                    :dynamic? true}]})
+  (is (= 14 (eval '(ns1894/unnecessary-adding-macro 8 6)))))
