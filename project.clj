@@ -8,7 +8,9 @@
   :profiles {:clojure-18
              {:dependencies [[org.clojure/clojure "1.8.0"]]}
              :clojure-17
-             {:dependencies [[org.clojure/clojure "1.7.0"]]}}
+             {:dependencies [[org.clojure/clojure "1.7.0"]]}
+             :dev
+             {:source-paths ["tmp-test-classpath"]}}
   :aliases {"test-all"
             ["do"
              ["clean"]

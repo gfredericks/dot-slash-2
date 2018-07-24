@@ -1,5 +1,6 @@
 (ns com.gfredericks.dot-slash-2-test
-  (:require [com.gfredericks.dot-slash-2 :as sut]
+  (:require [clojure.java.shell :refer [sh]]
+            [com.gfredericks.dot-slash-2 :as sut]
             [clojure.test :refer [deftest is]]))
 
 (def fifteen 14)
@@ -35,9 +36,12 @@
           (binding [*err* *out*]
             (sut/! '{&$%&! [doesn't-exist/at-all
                             com.gfredericks.dot-slash-2-test/fifteen]})))]
-    (is (not (resolve '&$%&!/at-all))
-        "The proxy var didn't get created")
-    (is (re-find #"dot-slash-2 failed to require 'doesn't-exist to proxy 'at-all" stderr))
+    (is (resolve '&$%&!/at-all)
+        "The proxy var was created")
+    (is (thrown-with-msg? Exception #"failed to require"
+                          (eval '(&$%&!/at-all 1 2 3)))
+        "throws an exception if you call it")
+    (is (re-find #"dot-slash-2 failed to require doesn't-exist" stderr))
     (is (= 14 (eval '&$%&!/fifteen)))))
 
 (def mutate-me 49)
@@ -80,9 +84,39 @@
 
 (defmacro unnecessary-adding-macro
   [a b]
-    `(+ ~a ~b))
+  `(+ ~a ~b))
 
 (deftest dynamic-macros-test
   (sut/! {'ns1894 [{:var      `unnecessary-adding-macro
                     :dynamic? true}]})
   (is (= 14 (eval '(ns1894/unnecessary-adding-macro 8 6)))))
+
+(deftest lazy-test
+  (let [ns-name (str "ns" (rand-int 0x7FFFFFFF))
+        fn-sym (symbol ns-name "jamboreen")]
+    (sh "mkdir" "tmp-test-classpath")
+    (spit (format "tmp-test-classpath/%s.clj" ns-name)
+          (format "(ns %s) (defn jamboreen [x] x)"
+                  ns-name))
+    (sut/! {'ns82 [{:var      fn-sym
+                    :dynamic? true
+                    :lazy?    true}]})
+    (is (thrown? Exception
+                 (eval (list fn-sym :foo)))
+        "hasn't been required yet")
+    (is (= :foo (eval '(ns82/jamboreen :foo)))
+        "works through the proxy, which requires it")
+    (is (= :foo (eval (list fn-sym :foo)))
+        "direct call works this time, proving it's been required")))
+
+(deftest lazy-dynamic-test
+  (sut/! {'ns4781 [{:var      'clojure.data/diff
+                    :dynamic? true
+                    :lazy?    true
+                    :macro?   false}
+                   {:var      'clojure.core/or
+                    :dynamic? true
+                    :lazy?    true
+                    :macro?   true}]})
+  (is (= [nil nil {}] (eval '(ns4781/diff {} {}))))
+  (is (= 42 (eval '(ns4781/or nil false false 42 (throw (Exception. "unreachable")))))))
