@@ -51,6 +51,19 @@
 (defn ^:private setup-var
   [underlying-symbol new-var dynamic? lazy? macro?]
   (if lazy?
+    ;; Note: a consequence of how this is done independently for each
+    ;; var is that docstrings and other metadata aren't applied until
+    ;; the first call, even if they're already available (e.g., if the
+    ;; namespace is already loaded for some independent reason, or
+    ;; even because of another call to a dot-slash var); we could at
+    ;; least improve it to where we
+    ;;
+    ;; 1) check at this point if the namespace is already loaded,
+    ;;    and ignore the laziness if so
+    ;; 2) when we process the first call to a var, realize all the
+    ;;    other vars proxying to that namespace as well; we might
+    ;;    even take the opportunity to check if any other namespaces
+    ;;    have been loaded in the meantime
     (let [root-value
           (if dynamic?
             (let [d (delay (set-dynamic-docstring
